@@ -5,7 +5,7 @@
 #include <istream>
 #include <sstream>
 
-int measurePaper(const std::string& input) {
+std::tuple<int, int, int> parseDimensions(const std::string& input) {
     int l, w, h;
 
     std::string dimensions = input;
@@ -17,29 +17,23 @@ int measurePaper(const std::string& input) {
     std::stringstream ss(dimensions);
     ss >> l >> w >> h;
 
+    return {l, w, h};
+}
+
+int measurePaper(const std::string& input) {
+    int l, w, h;
+    std::tie(l, w, h) = parseDimensions(input);
     int lw = l * w;
     int wh = w * h;
     int hl = h * l;
-
     int min_side = std::min({lw, wh, hl});
-
-    // Calculate total area
     return 2 * lw + 2 * wh + 2 * hl + min_side;
 }
 
 int measureRibbon(const std::string& input) {
     int l, w, h;
-
-    std::string dimensions = input;
-    for (char& c : dimensions) {
-        if (c == 'x') {
-            c = ' ';
-        }
-    }
-    std::stringstream ss(dimensions);
-    ss >> l >> w >> h;
-
-    int lwh[3] = {l, w, h};
+    std::tie(l, w, h) = parseDimensions(input);
+    std::array<int, 3> lwh = {l, w, h};
     std::sort(std::begin(lwh), std::end(lwh));
     int a = lwh[0];
     int b = lwh[1];
